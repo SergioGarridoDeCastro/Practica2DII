@@ -34,54 +34,54 @@ contract Practica2 is IERC20, Ownable{
     using SafeMath for uint256;
 
     //Atributos tipicos de tokens ERC20
-    string public override name; 
-    string public override symbol;
-    uint8 public override decimals;
+    string public name; 
+    string public symbol;
+    uint8 public decimals;
     uint256 public totalSupply;
 
-    mapping(address => uint256) public balance;
+    mapping(address => uint256) public balances;
     mapping(address => mapping(address => uint256)) public allowed;
 
     //Se emite cada vez que se realiza una transferencia exitosa de tokens 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event TransferEvent(address indexed _from, address indexed _to, uint256 _value);
     //Se emite cada vez que se otorga o revoca la aprobacion para gastar tokens desde una dirección propietaria a otra que gasta
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+    event ApprovalEvent(address indexed _owner, address indexed _spender, uint256 _value);
     
 
 
-    constructor(string memory _name, string memory _symbol, uint256 _decimals,  uint256 _totalSupply){
+    constructor(string memory _name, string memory _symbol, uint256 _decimals,  uint256 _totalSupply) Ownable(msg.sender){
         name = _name;
         symbol = _symbol;
-        decimals = _decimals;
+        decimals = uint8(_decimals);
         totalSupply = _totalSupply;
-        balance[msg.sender] = _totalSupply;
+        balances[msg.sender] = _totalSupply;
     }
 
     /**
     * @dev Devuelve el nombre del token
     */
-    function name() public view returns (string){
+    function getTokenName() public view returns (string memory){
         return name;
     }
 
     /**
     * @dev Devuelve el simbolo del token
     */
-    function symbol() public view returns (string){
+    function getTokenSymbol() public view returns (string memory){
         return symbol;
     }
 
     /**
     * @dev Devuelve los decimales que utiliza el token
     */
-    function decimals() public view returns (uint8){
+    function getTokenDecimals() public view returns (uint8){
         return decimals;
     }
 
     /**
     * @dev Numero total de tokens existentes
     */
-    function totalSupply() public view returns (uint256){
+    function getTokenTotalSupply() public view returns (uint256){
         return totalSupply;
     }
 
@@ -91,7 +91,7 @@ contract Practica2 is IERC20, Ownable{
     * @return balance Un uint256 que representa el saldo de la cuenta especificada
     */
     function balanceOf(address owner) public view returns (uint256 balance){
-        return balance[owner];
+        return balances[owner];
     }
 
     /**
@@ -103,10 +103,10 @@ contract Practica2 is IERC20, Ownable{
     * @return success Un bool que indica si la operacion ha sido exitosa
     */
     function transfer(address to, uint256 value) public returns (bool success){
-        require(balance[msg.sender] >= value, "Valor insuficiente");
-        balance[msg.sender] -= value;
-        balance[to] += value;
-        emit Transfer(sender, to, value);
+        require(balances[msg.sender] >= value, "Valor insuficiente");
+        balances[msg.sender] -= value;
+        balances[to] += value;
+        emit TransferEvent(msg.sender, to, value);
         return true;
     }
 
@@ -116,31 +116,31 @@ contract Practica2 is IERC20, Ownable{
     * tokens para gastar. El método transferFrom se utiliza para un flujo de trabajo de retirada, permitiendo a los 
     * contratos transferir tokens en su nombre. Esto puede usarse, por ejemplo, para permitir a un contrato transferir 
     * tokens en tu nombre y/o cobrar comisiones en submonedas.
-    * @param from Direccion de la cuenta desde la que se transfieren los tokens
-    * @param to Direccion de la cuenta a la que transferir
-    * @param value Cantidad de tokens a transferir
+    * @param _from Direccion de la cuenta desde la que se transfieren los tokens
+    * @param _to Direccion de la cuenta a la que transferir
+    * @param _value Cantidad de tokens a transferir
     * @return success Un bool que indica si la operacion ha sido exitosa
     */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
-        require(balance[_from] >= _value, "Saldo insuficiente");
-        require(allowed[_from][_to] >= _value, "Allowance insuficiente");
-        balance[_from] -= _value;
-        balance[_to] += _value;
+        require(balances[_from] >= _value, "Saldo insuficiente");
+        require(allowed[_from][msg.sender] >= _value, "Allowance insuficiente");
+        balances[_from] -= _value;
+        balances[_to] += _value;
         allowed[_from][msg.sender] -= _value;
-        emit Transfer(_from, _to, _value);
+        emit TransferEvent(_from, _to, _value);
         return true;
     }
 
     /**
     * @dev Permite a _spender retirar de su cuenta varias veces, hasta la cantidad _value. Si se vuelve 
     * a llamar a esta función, se sobrescribe la cantidad permitida actual con _value.
-    * @param spender Direccion que retira tokens de la cuenta
-    * @param value Cantidad de tokens a retirar
+    * @param _spender Direccion que retira tokens de la cuenta
+    * @param _value Cantidad de tokens a retirar
     * @return success Un bool que indica si la operacion ha sido exitosa
     */
     function approve(address _spender, uint256 _value) public returns (bool success){
-        allowed[msg.sender][_spender] = value;
-        emit Approval(msg.sendder, _spender, _value);
+        allowed[msg.sender][_spender] = _value;
+        emit ApprovalEvent(msg.sender, _spender, _value);
         return true;
     }
 
@@ -151,7 +151,7 @@ contract Practica2 is IERC20, Ownable{
     * @return restante Un uint256 que representa la cantidad de tokens restantes.
     */
     function allowance(address _owner, address _spender) public view returns (uint256 restante){
-        return allowed[_ownner][_spender];
+        return allowed[_owner][_spender];
     }
 
 }
