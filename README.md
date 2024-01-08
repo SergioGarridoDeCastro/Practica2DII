@@ -1,4 +1,4 @@
-#**Practica 2 de la 2ª Parte DII MIoT 2023-24**
+**Practica 2 de la 2ª Parte DII MIoT 2023-24**
 
 En la siguiente pr´actica, se explora el est´andar y, consiguientemente, los tokens
 ERC20 de la blockchain de Ethereum.
