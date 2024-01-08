@@ -34,18 +34,18 @@ contract Practica2 is IERC20, Ownable{
     using SafeMath for uint256;
 
     //Atributos tipicos de tokens ERC20
-    string public name; 
-    string public symbol;
-    uint8 public decimals;
+    string name; 
+    string symbol;
+    uint8 decimals;
     uint256 public totalSupply;
 
-    mapping(address => uint256) public balances;
-    mapping(address => mapping(address => uint256)) public allowed;
+    mapping(address => uint256) balances;
+    mapping(address => mapping(address => uint256)) allowed;
 
-    //Se emite cada vez que se realiza una transferencia exitosa de tokens 
-    event TransferEvent(address indexed _from, address indexed _to, uint256 _value);
-    //Se emite cada vez que se otorga o revoca la aprobacion para gastar tokens desde una dirección propietaria a otra que gasta
-    event ApprovalEvent(address indexed _owner, address indexed _spender, uint256 _value);
+    //Se emite cada vez que se realiza una transferencia exitosa de tokens. Se comenta por estar incluido en IERC20.sol
+    //event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    //Se emite cada vez que se otorga o revoca la aprobacion para gastar tokens desde una dirección propietaria a otra que gasta.  Se comenta por estar incluido en IERC20.sol
+    //event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     
 
 
